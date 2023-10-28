@@ -8,20 +8,20 @@ namespace BSU.BRSM.Bot.Commands
     {
         public override string Name => "start";
 
-        public async override Task Execute(Update update, TelegramBotClient client)
+        public async override Task Execute(Update update, TelegramBotClient client, string message = "")
         {
-            var ikm = new InlineKeyboardMarkup(new InlineKeyboardButton[][]
-            {
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData(text: "задать вопрос", callbackData: "question"),
-                    InlineKeyboardButton.WithCallbackData(text: "о нас", callbackData: "about")
-                }
-            });
+            //var ikm = new InlineKeyboardMarkup(new InlineKeyboardButton[][]
+            //{
+            //    new[]
+            //    {
+            //        InlineKeyboardButton.WithCallbackData(text: "задать вопрос", callbackData: "question"),
+            //        InlineKeyboardButton.WithCallbackData(text: "о нас", callbackData: "about")
+            //    }
+            //});
 
-            var message = update.Message ?? throw new ArgumentNullException(nameof(update));
+            var chatMessage = update.Message ?? throw new ArgumentNullException(nameof(update));
 
-            await client.SendTextMessageAsync(message.Chat.Id, $"Привет, {message.Chat.FirstName}!", replyMarkup: ikm);
+            await client.SendTextMessageAsync(chatMessage.Chat.Id, $"Привет, {chatMessage.Chat.FirstName}!"); //, replyMarkup: ikm);
         }
     }
 }

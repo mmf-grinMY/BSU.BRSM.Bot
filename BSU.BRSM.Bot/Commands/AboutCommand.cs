@@ -17,7 +17,7 @@ public class AboutCommand : Command
         "7. Молодежный политический клуб;\n\n" + 
         "8. Навправление документационного обеспечения.";
 
-    public async override Task Execute(Update update, TelegramBotClient client)
+    public async override Task Execute(Update update, TelegramBotClient client, string message = "")
     {
         if (update is null) return;
         if (update.Message is null) return;
