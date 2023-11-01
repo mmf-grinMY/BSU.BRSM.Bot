@@ -1,5 +1,7 @@
 ﻿using BSU.BRSM.Bot.Commands;
+using BSU.BRSM.Bot.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -7,124 +9,50 @@ using static BSU.BRSM.Bot.Bot;
 
 namespace BSU.BRSM.Bot.Controllers;
 
-public class Question 
-{
-    public DateTime DateTime { get; private set; }
-    public string QuestionBody { get; private set; } = string.Empty;
-    public bool IsQuestionEnded { get; set; } = false;
-    public Question AddPart(string part)
-    {
-        DateTime = DateTime.Now;
-        QuestionBody += part + '\n';
-        return this;
-    }
-    public override string ToString()
-    {
-        return $"Question : {{ DateTime : \"{DateTime}\", QuestionBody : {QuestionBody}, IsQuestionEnded : \"{IsQuestionEnded}\" }}";
-    }
-}
-
-public class User
-{
-    public User(long chatId)
-    {
-        ChatId = chatId;
-        Questions = new List<Question>();
-    }
-    public bool IsQuestionCommand { get; set; } = false;
-    public long ChatId { get; set; }
-    public List<Question> Questions { get; set; }
-    public User AddQuestion(string question)
-    {
-        if (Questions.Count == 0 || Questions[^1].IsQuestionEnded)
-        {
-            Questions.Add(new Question().AddPart(question));
-        }
-        else
-        {
-            Questions[^1].AddPart(question);
-        }
-        return this;
-    }
-    public override string ToString()
-    {
-        return $"User : {{ ChatId : \"{ChatId}\", Questions : {Questions.ToJsonString()} }}";
-    }
-}
-
 [ApiController]
 [Route("/")]
-public class BotController : ControllerBase
+public class BotController : Controller
 {
     private readonly TelegramBotClient bot = GetTelegramBot();
     [HttpPost]
-    public async Task<string> Post(Update update)
+    public async Task Post(Update update)
     {
+        if (update is null) return;
         if (update.Message is null) throw new ArgumentNullException(nameof(update));
-        long chatId = update.Message.Chat.Id;
+        var chatId = update.Message.Chat.Id;
         var message = update.Message;
         var commands = Bot.Commands;
 
         string text = message?.Text ?? throw new ArgumentNullException(nameof(update));
-        User user;
-        if (!Users.ContainsKey(chatId))
-        {
-            Users.Add(chatId, user = new User(chatId));
-        }
-        else
-        {
-            user = Users[chatId];
-        }
+        Models.User user = new(chatId);
         if (text[0] == '/')
         {
             if (user.IsQuestionCommand && !text.StartsWith("/endquestion"))
             {
-                bool isCommand = false;
-                foreach (var command in Bot.Commands)
-                {
-                    if (text.StartsWith("/" + command.Name))
-                    {
-                        isCommand = true;
-                    }
-                }
-                if (isCommand)
+                if (Bot.Commands.Any(x => text.StartsWith("/" + x.Name)))
                 {
                     await bot.SendTextMessageAsync(chatId, "Вы не можете пользоваться другими командами во время ввода вопроса! Сначало завершите ввод вопроса с помощью команды /endquestion.");
                 }
                 else
                 {
-                    await AddQuestion(user, text, message);
+                    await user.AddQuestion(text);
                 }
             }
             else
             {
-                bool isCommand = false;
                 string chatMessage = string.Empty;
-                user.IsQuestionCommand = false;
-                foreach (var command in commands)
-                {
-                    if (command.Contains(text))
-                    {
-                        isCommand = true;
-                        if (command is QuestionCommand)
-                        {
-                            if ((text = text.Replace("/question", "").Trim()).Length != 0)
-                            {
-                                user.AddQuestion(text).Questions[^1].IsQuestionEnded = true;
-                                chatMessage = "Ваш вопрос отправлен комитету. Мы постараемся ответить Вам в ближайшее время.";
-                            }
-                            else
-                            {
-                                user.IsQuestionCommand = true;
-                                chatMessage = "Вы можете вводить свой вопрос несколькими сообщениями. Чтобы закончить ввод вопроса введите команду /endquestion";
-                            }
-                        }
-                        await command.Execute(update, bot, chatMessage);
-                        return Users.ToArrayString();
-                    }
-                }
+                Command? command = Bot.Commands.FirstOrDefault(x => text.StartsWith("/" + x.Name));
 
-                if (!isCommand)
+                if (command is not null)
+                {
+                    if (command is QuestionCommand)
+                    {
+                        chatMessage = (text = text.Replace("/question", "").Trim()).Length != 0 ? await user.AddQuestion(text) : await user.AddQuestionPart("");
+                    }
+
+                    await command.Execute(update, bot, chatMessage);
+                }
+                else
                 {
                     await bot.SendTextMessageAsync(chatId, "Неверная команда!");
                 }
@@ -132,64 +60,41 @@ public class BotController : ControllerBase
         }
         else
         {
-            await AddQuestion(user, text, message);
-        }
-
-        return Users.ToArrayString();
-    }
-    [HttpGet]
-    public string Get() => Users.Count == 0 ? "Telegram бот запущен!" : Users.ToArrayString();
-    private async Task AddQuestion(User user, string text, Message message)
-    {
-        if (user.IsQuestionCommand)
-        {
-            if (user.Questions.Count != 0)
+            if (user.IsQuestionCommand)
             {
-                if (user.Questions[^1].IsQuestionEnded)
-                {
-                    user.AddQuestion(text);
-                }
-                else
-                {
-                    user.Questions[^1].AddPart(text);
-                }
+                await user.AddQuestionPart(text);
             }
             else
             {
-                user.AddQuestion(text);
+                // Exception
+                try
+                {
+                    await bot.SendTextMessageAsync(message.Chat.Id, "Для того, чтобы задать боту вопрос введите команду /question!", replyToMessageId: message.MessageId - 1);
+                }
+                catch (Exception ex)
+                {
+
+                }
             }
         }
-        else
-        {
-            await bot.SendTextMessageAsync(message.Chat.Id, "Для того, чтобы задать боту вопрос введите команду /question!", replyToMessageId: message.MessageId - 1);
-        }
-    } 
-}
-
-public static class DictionaryExtensions
-{
-    public static string ToArrayString<T, P>(this Dictionary<T, P> dict)
-    {
-        if (Users is null || Users.Count == 0) return string.Empty;
-        StringBuilder builder = new();
-        builder.Append('[');
-        foreach (var item in dict)
-        {
-            builder.Append(item.Value?.ToString()).Append(",\n");
-        }
-        builder.Append(']');
-        return builder.ToString().Replace(",\n]", " ]");
     }
-    public static string ToJsonString<T>(this List<T> list)
+    [HttpGet]
+    public ViewResult Index()
     {
-        if (list.Count == 0) return "[]";
+        List<Question> questons = new();
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.OpenAsync();
         StringBuilder builder = new();
-        builder.Append('[');
-        foreach (T item in list)
+        SqliteCommand command = new("SELECT * FROM questions", connection);
+        using var reader = command.ExecuteReader();
+        if (reader.HasRows)
         {
-            builder.Append(item?.ToString()).Append(",\n");
+            while (reader.Read())
+            {
+                questons.Add(new Question(reader.GetInt64(0), reader.GetString(1), reader.GetBoolean(2), reader.GetDateTime(3)));
+            }
         }
-        builder.Append(']');
-        return builder.ToString().Replace(",\n]", " ]");
+
+        return View(model: questons);
     }
 }

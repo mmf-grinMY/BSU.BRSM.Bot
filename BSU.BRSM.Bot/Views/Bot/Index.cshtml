@@ -1,0 +1,57 @@
+﻿@{
+    Layout = null;
+}
+@model List<BSU.BRSM.Bot.Models.Question>;
+
+<style>
+    table {
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+    tr {
+        border: 1px solid #ccc;
+    }
+    td, th {
+        border: 1px solid #ccc;
+        align-content: center;
+        text-align: center;
+        padding: 5px;
+    }
+    .td-text-align-right {
+        text-align: right;
+    }
+    .collapsed {
+        border-collapse: collapse;
+    }
+    .td-is-ended {
+        width: 60px;
+    }
+    .td-datetime {
+        width: 150px
+    }
+</style>
+
+<h1>Telegram Bot успешно запущен!</h1>
+
+<nav>
+    
+</nav>
+
+<table class="collapsed">
+    <thead>
+        <tr>
+            <th>Вопрос</th> <th>Закончен</th> <th>Время отправки</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var item in @Model)
+            {
+                string end = item.IsEnded == true ? "Да" : "Нет";
+                <tr onclick="window.location.href='Answer/Index?chatId=@item.ChatId.ToString()&DateTime=@item.DateTime.ToString("yyyy-MM-dd HH:mm:ss")'">
+                    <td class="td-text-align-right">@item.Body</td> <td class="td-is-ended">@end</td> <td class="td-datetime">@item.DateTime</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

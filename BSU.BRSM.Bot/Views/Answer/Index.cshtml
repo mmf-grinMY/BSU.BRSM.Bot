@@ -1,0 +1,23 @@
+﻿@{
+    Layout = null;
+}
+@model BSU.BRSM.Bot.Models.Question;
+
+<p>@Model.Body</p>
+
+@functions{
+    public object OnPostDelete(long chatId, DateTime dateTime)
+    {
+        BSU.BRSM.Bot.Models.User.DeleteQuestion(chatId, dateTime);
+        return new object();
+    }
+}
+
+<form method="post" autocomplete="off">
+    <input name="answer" type="search" placeholder="Ответ"/>
+    <input type="submit" value="Отправить"/>
+</form>
+@*<form method="post">
+    <input type="submit" value="Удалить" onclick=@OnPostDelete(Model.ChatId, Model.DateTime)/>
+</form>*@
+<script src="/_framework/aspnetcore-browser-refresh.js"></script>

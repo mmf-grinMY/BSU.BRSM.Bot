@@ -7,7 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="tunnels.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove=".env" />
+    <None Remove="bot_start.bat" />
+    <None Remove="bsu_brsm_bot.db" />
+    <None Remove="insert_test.sql" />
+    <None Remove="ngrok.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.13" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.13" />
     <PackageReference Include="Telegram.Bot" Version="19.0.0" />
   </ItemGroup>
 

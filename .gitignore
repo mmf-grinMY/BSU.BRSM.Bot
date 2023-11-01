@@ -365,3 +365,5 @@ FodyWeavers.xsd
 Docs/
 todo.md
 tunnels.json
+bsu_brsm_bot.db
+insert_test.sql

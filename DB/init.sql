@@ -1,0 +1,6 @@
+﻿CREATE TABLE questions(
+ChatId INT NOT NULL,
+Body TEXT NOT NULL,
+IsEnded BOOLEAN NOT NULL,
+DATETIME DateTime NOT NULL
+);

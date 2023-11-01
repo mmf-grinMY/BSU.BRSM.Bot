@@ -1,5 +1,6 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot;
+using Microsoft.Data.Sqlite;
 
 namespace BSU.BRSM.Bot.Commands;
 public class QuestionCommand : Command
@@ -16,28 +17,25 @@ public class QuestionCommand : Command
 public class EndQuestionCommand : Command
 {
     public override string Name => "endquestion";
-
     public override async Task Execute(Update update, TelegramBotClient client, string message = "")
     {
-        if (Bot.Users.ContainsKey(update.Message.Chat.Id))
+        long chatId = update.Message.Chat.Id;
+        using SqliteConnection connection = new(Bot.ConnectionString);
+        await connection.OpenAsync();
+        SqliteCommand command = new($"SELECT IsEnded FROM questions WHERE chatId == {chatId} AND IsEnded == 0", connection);
+        using (var reader = command.ExecuteReader())
         {
-            var user = Bot.Users[update.Message.Chat.Id];
-            if (user.Questions.Count > 0)
+            if (reader.HasRows)
             {
-                if (user.Questions[^1].IsQuestionEnded)
-                {
-                    await client.SendTextMessageAsync(update.Message.Chat.Id, "У Вас нет открытых вопросов для отправки комитету. Чтобы задать вопрос воспользуйтесь командой /question");
-                }
-                else
-                {
-                    user.Questions[^1].IsQuestionEnded = true;
-                    await client.SendTextMessageAsync(update.Message.Chat.Id, "Ваш вопрос отправлен комитету. Мы постараемся ответить Вам в ближайшее время.");
-                }
+                command = new($"UPDATE questions SET IsEnded = 1 WHERE chatId == {chatId} AND IsEnded == 0", connection);
+                await command.ExecuteNonQueryAsync();
+                await client.SendTextMessageAsync(chatId, "Ваш вопрос отправлен комитету. Мы постараемся ответить Вам в ближайшее время.");
+            }
+            else
+            {
+                await client.SendTextMessageAsync(chatId, "У Вас нет открытых вопросов для отправки комитету. Чтобы задать вопрос воспользуйтесь командой /question");
             }
         }
-        else
-        {
-            await client.SendTextMessageAsync(update.Message.Chat.Id, "У Вас нет открытых вопросов для отправки комитету. Чтобы задать вопрос воспользуйтесь командой /question");
-        }
+        await connection.CloseAsync();
     }
 }
