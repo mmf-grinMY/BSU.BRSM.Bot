@@ -5,10 +5,23 @@ namespace BSU.BRSM.Bot.Models;
 
 public class User
 {
-    public User(long chatId)
+    public User(long chatId, string firstName, string lastName)
     {
         ChatId = chatId;
+        FirstName = firstName;
+        LastName = lastName;
+        //using var connection = new SqliteConnection(ConnectionString);
+        //connection.Open();
+        //var reader = new SqliteCommand($"SELECT first_name, last_name FROM questions WHERE chatId == {ChatId}", connection).ExecuteReader();
+        //if (reader.HasRows)
+        //{
+        //    reader.Read();
+        //    FirstName = reader.GetString(0);
+        //    LastName = reader.GetString(1);
+        //}
     }
+    public string FirstName { get; } // = string.Empty;
+    public string LastName { get; } // = string.Empty;
     public long ChatId { get; }
     private bool? _isQuestionCommand = null;
     public bool IsQuestionCommand
@@ -31,7 +44,7 @@ public class User
     }
     public async Task<string> AddQuestionPart(string part)
     {
-        string body = null;
+        string? body = null;
         using SqliteConnection connection = new(ConnectionString);
         await connection.OpenAsync();
         if (part != "")
@@ -81,7 +94,7 @@ public class User
             if (reader.HasRows)
             {
                 reader.Read();
-                question = new Question(reader.GetInt64(0), reader.GetString(1), reader.GetBoolean(2), reader.GetDateTime(3));
+                question = new Question(reader.GetString(1), reader.GetBoolean(2), reader.GetDateTime(3));
             }
         }
         await connection.CloseAsync();
@@ -94,5 +107,18 @@ public class User
         await connection.OpenAsync();
         await new SqliteCommand($"DELETE FROM questions WHERE chatId == {chatId} AND DateTime == \"{dateTime:yyyy-MM-dd HH:mm:ss}\"", connection).ExecuteNonQueryAsync();
         await connection.CloseAsync();
+    }
+    public IEnumerable<Question> GetQuestions()
+    {
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.Open();
+        var reader = new SqliteCommand($"SELECT * FROM questions WHERE chatId == {ChatId}", connection).ExecuteReader();
+        if (reader.HasRows)
+        {
+            while (reader.Read())
+            {
+                yield return new Question(reader.GetString(1), reader.GetBoolean(2), reader.GetDateTime(3));
+            }
+        }
     }
 }

@@ -6,6 +6,8 @@ using Telegram.Bot.Types.Enums;
 
 namespace BSU.BRSM.Bot.Controllers
 {
+    [ApiController]
+    [Route("Answer/")]
     public class AnswerController : Controller
     {
         private static readonly int messageLength = 1000;
@@ -15,6 +17,10 @@ namespace BSU.BRSM.Bot.Controllers
             var question = await Models.User.GetQuestion(chatId, dateTime);
             ViewData.Model = question;
             return View();
+        }
+        public void Remove()
+        {
+            Console.WriteLine("Hello!");
         }
         [HttpPost]
         public async Task Index(string chatId, string dateTime, string answer)
@@ -31,7 +37,7 @@ namespace BSU.BRSM.Bot.Controllers
             //}
             await Bot.GetTelegramBot().SendTextMessageAsync(chatId, message, parseMode: ParseMode.MarkdownV2);
 
-            await question.Close();
+            await question.Close(chatId);
             Response.Redirect("/");
         }
     }

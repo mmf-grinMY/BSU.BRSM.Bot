@@ -17,63 +17,69 @@ public class BotController : Controller
     [HttpPost]
     public async Task Post(Update update)
     {
-        if (update is null) return;
-        if (update.Message is null) throw new ArgumentNullException(nameof(update));
-        var chatId = update.Message.Chat.Id;
-        var message = update.Message;
-        var commands = Bot.Commands;
-
-        string text = message?.Text ?? throw new ArgumentNullException(nameof(update));
-        Models.User user = new(chatId);
-        if (text[0] == '/')
+        if (update is Update)
         {
-            if (user.IsQuestionCommand && !text.StartsWith("/endquestion"))
+            if (update.Message is Message message)
             {
-                if (Bot.Commands.Any(x => text.StartsWith("/" + x.Name)))
+                if (message.Text is string text)
                 {
-                    await bot.SendTextMessageAsync(chatId, "Вы не можете пользоваться другими командами во время ввода вопроса! Сначало завершите ввод вопроса с помощью команды /endquestion.");
-                }
-                else
-                {
-                    await user.AddQuestion(text);
-                }
-            }
-            else
-            {
-                string chatMessage = string.Empty;
-                Command? command = Bot.Commands.FirstOrDefault(x => text.StartsWith("/" + x.Name));
+                    var chatId = update.Message.Chat.Id;
+                    var commands = Bot.Commands;
 
-                if (command is not null)
-                {
-                    if (command is QuestionCommand)
+                    Models.User user = new(chatId);
+                    if (text[0] == '/')
                     {
-                        chatMessage = (text = text.Replace("/question", "").Trim()).Length != 0 ? await user.AddQuestion(text) : await user.AddQuestionPart("");
+                        if (user.IsQuestionCommand && !text.StartsWith("/endquestion"))
+                        {
+                            if (Bot.Commands.Any(x => text.StartsWith("/" + x.Name)))
+                            {
+                                await bot.SendTextMessageAsync(chatId, "Вы не можете пользоваться другими командами во время ввода вопроса! Сначало завершите ввод вопроса с помощью команды /endquestion.");
+                            }
+                            else
+                            {
+                                await user.AddQuestion(text);
+                            }
+                        }
+                        else
+                        {
+                            string chatMessage = string.Empty;
+                            Command? command = Bot.Commands.FirstOrDefault(x => text.StartsWith("/" + x.Name));
+
+                            if (command is not null)
+                            {
+                                if (command is QuestionCommand)
+                                {
+                                    chatMessage = (text = text.Replace("/question", "").Trim()).Length != 0 ?
+                                        await user.AddQuestion(text) : await user.AddQuestionPart("");
+                                }
+
+                                await command.Execute(update, bot, chatMessage);
+                            }
+                            else
+                            {
+                                await bot.SendTextMessageAsync(chatId, "Неверная команда!");
+                            }
+                        }
                     }
+                    else
+                    {
+                        if (user.IsQuestionCommand)
+                        {
+                            await user.AddQuestionPart(text);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                int messageId = message.MessageId;
+                                await bot.SendTextMessageAsync(message.Chat.Id, "Для того, чтобы задать боту вопрос введите команду /question!", replyToMessageId: messageId - 1);
+                            }
+                            catch (Exception ex)
+                            {
 
-                    await command.Execute(update, bot, chatMessage);
-                }
-                else
-                {
-                    await bot.SendTextMessageAsync(chatId, "Неверная команда!");
-                }
-            }
-        }
-        else
-        {
-            if (user.IsQuestionCommand)
-            {
-                await user.AddQuestionPart(text);
-            }
-            else
-            {
-                // Exception
-                try
-                {
-                    await bot.SendTextMessageAsync(message.Chat.Id, "Для того, чтобы задать боту вопрос введите команду /question!", replyToMessageId: message.MessageId - 1);
-                }
-                catch (Exception ex)
-                {
-
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -81,7 +87,7 @@ public class BotController : Controller
     [HttpGet]
     public ViewResult Index()
     {
-        List<Question> questons = new();
+        List<BSU.BRSM.Bot.Models.User> users = new();
         using var connection = new SqliteConnection(ConnectionString);
         connection.OpenAsync();
         StringBuilder builder = new();
@@ -91,10 +97,12 @@ public class BotController : Controller
         {
             while (reader.Read())
             {
-                questons.Add(new Question(reader.GetInt64(0), reader.GetString(1), reader.GetBoolean(2), reader.GetDateTime(3)));
+                // users.Add(new Question(reader.GetInt64(0), reader.GetString(1), reader.GetBoolean(2), reader.GetDateTime(3)));
+                var question = new Question(reader.GetInt64(0), reader.GetString(1), reader.GetBoolean(2), reader.GetDateTime(3));
+
             }
         }
 
-        return View(model: questons);
+        return View(model: users);
     }
 }

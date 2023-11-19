@@ -5,6 +5,12 @@ VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSU.BRSM.Bot", "BSU.BRSM.Bot\BSU.BRSM.Bot.csproj", "{D9E30201-005E-4A83-B5D4-C5447675CC5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSU.BRSM.Bot.Core", "BSU.BRSM.Bot.Core\BSU.BRSM.Bot.Core.csproj", "{113A4060-91E9-46D5-8A9D-039A2112C8D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "domain", "domain", "{A1215595-CA36-4ECD-BDE2-41D3FF5C2484}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Новая папка1", "Новая папка1", "{4351AB78-5021-4CC2-9890-D8D681AC5890}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +21,16 @@ Global
 		{D9E30201-005E-4A83-B5D4-C5447675CC5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9E30201-005E-4A83-B5D4-C5447675CC5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9E30201-005E-4A83-B5D4-C5447675CC5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{113A4060-91E9-46D5-8A9D-039A2112C8D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{113A4060-91E9-46D5-8A9D-039A2112C8D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{113A4060-91E9-46D5-8A9D-039A2112C8D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{113A4060-91E9-46D5-8A9D-039A2112C8D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{113A4060-91E9-46D5-8A9D-039A2112C8D2} = {A1215595-CA36-4ECD-BDE2-41D3FF5C2484}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7664779A-72B6-45C9-99B0-3758AB940CCE}

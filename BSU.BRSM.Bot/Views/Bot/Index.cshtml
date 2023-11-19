@@ -1,7 +1,8 @@
 ﻿@{
     Layout = null;
 }
-@model List<BSU.BRSM.Bot.Models.Question>;
+@using BSU.BRSM.Bot.Models;
+@model List<User>;
 
 <style>
     table {
@@ -33,9 +34,15 @@
 
 <h1>Telegram Bot успешно запущен!</h1>
 
-<nav>
-    
-</nav>
+<header>
+    <div>
+        <ul>
+            <li><a href="/">Вопросы</a></li>
+            <li><a href="/Settings">Настройки</a></li>
+            <li><a href="/Login">Войти</a></li>
+        </ul>
+    </div>
+</header>
 
 <table class="collapsed">
     <thead>
@@ -45,13 +52,20 @@
     </thead>
     <tbody>
         @{
-            foreach (var item in @Model)
+            foreach (var user in @Model)
             {
-                string end = item.IsEnded == true ? "Да" : "Нет";
-                <tr onclick="window.location.href='Answer/Index?chatId=@item.ChatId.ToString()&DateTime=@item.DateTime.ToString("yyyy-MM-dd HH:mm:ss")'">
-                    <td class="td-text-align-right">@item.Body</td> <td class="td-is-ended">@end</td> <td class="td-datetime">@item.DateTime</td>
-                </tr>
+                foreach (var item in user.GetQuestions())
+                {
+                    string end = item.IsEnded == true ? "Да" : "Нет";
+                    <tr onclick="window.location.href='Answer/Index?chatId=@item.ChatId.ToString()&DateTime=@item.DateTime.ToString("yyyy-MM-dd HH:mm:ss")'">
+                        <td>@user.FirstName</td><td>@user.LastName</td><td class="td-text-align-right">@item.Body</td> <td class="td-is-ended">@end</td> <td class="td-datetime">@item.DateTime</td>
+                    </tr>
+                }
             }
         }
     </tbody>
 </table>
+
+<footer>
+    <p>Все права защищены</p>
+</footer>

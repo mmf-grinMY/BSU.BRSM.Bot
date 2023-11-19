@@ -5,18 +5,19 @@
 
 <p>@Model.Body</p>
 
-@functions{
+@*@functions{
     public object OnPostDelete(long chatId, DateTime dateTime)
     {
         BSU.BRSM.Bot.Models.User.DeleteQuestion(chatId, dateTime);
         return new object();
     }
-}
+}*@
 
 <form method="post" autocomplete="off">
     <input name="answer" type="search" placeholder="Ответ"/>
     <input type="submit" value="Отправить"/>
 </form>
+<button action="Remove"><span>Удалить</span></button>
 @*<form method="post">
     <input type="submit" value="Удалить" onclick=@OnPostDelete(Model.ChatId, Model.DateTime)/>
 </form>*@

@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <None Remove=".env" />
+    <None Remove=".ngrok.exe.old" />
+    <None Remove="bot_get_url.bat" />
     <None Remove="bot_start.bat" />
     <None Remove="bsu_brsm_bot.db" />
     <None Remove="insert_test.sql" />
