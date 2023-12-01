@@ -1,0 +1,14 @@
+﻿@{
+    Layout = null;
+}
+
+@model BSU.BRSM.Bot.Core.Models.User;
+
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    @await Html.PartialAsync("Questions", new []{ Model });
+</body>
+</html>

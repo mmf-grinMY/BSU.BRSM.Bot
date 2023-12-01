@@ -26,6 +26,34 @@ h1 {
     color: green;
 }
 
-ul {
+table {
+    border: 1px solid #ccc;
+    width: 100%;
+}
 
+tr {
+    border: 1px solid #ccc;
+}
+
+td, th {
+    border: 1px solid #ccc;
+    align-content: center;
+    text-align: center;
+    padding: 5px;
+}
+
+.td-text-align-right {
+    text-align: right;
+}
+
+.collapsed {
+    border-collapse: collapse;
+}
+
+.td-is-ended {
+    width: 60px;
+}
+
+.td-datetime {
+    width: 150px
 }

@@ -1,4 +1,4 @@
-﻿namespace BSU.BRSM.Bot;
+﻿namespace BSU.BRSM.Bot.App;
 internal static class DotEnv
 { 
     public static void Load(string path)

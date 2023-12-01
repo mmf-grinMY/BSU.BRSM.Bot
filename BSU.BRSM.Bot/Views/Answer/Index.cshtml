@@ -1,24 +1,63 @@
 ﻿@{
     Layout = null;
 }
-@model BSU.BRSM.Bot.Models.Question;
 
-<p>@Model.Body</p>
+@model BSU.BRSM.Bot.Core.Models.Question;
 
-@*@functions{
-    public object OnPostDelete(long chatId, DateTime dateTime)
-    {
-        BSU.BRSM.Bot.Models.User.DeleteQuestion(chatId, dateTime);
-        return new object();
+<style>
+    div.answer-container {
+        width: 600px;
+        height: 500px;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        margin-left: -300px;
+        margin-top: -250px; 
+        background-color: #ffffdd;
+        border-radius: 4px;
+        border: 1px solid black;
     }
-}*@
+    p {
+        margin: 4px;
+        font-size: 20px;
+        font-family: 'Times New Roman';
+    }
+    textarea.answer {
+        margin: 0px 4px 4px 4px;
+        min-height: 300px;
+        width: 592px;
+        resize: none;
+        top: 0;
+        bottom: 30px;
+    }
+    div.submit-container {
+        margin: 0px 4px;
+    }
+    input.submit {
+        border-radius: 4px;
+        background-color: blue;
+        color:white;
+        height: 30px;
+        width: 294px;
+        bottom: 0;
+    }
+</style>
+<div class="answer-container">
+    <p id="question">@Model.Body</p>
 
-<form method="post" autocomplete="off">
-    <input name="answer" type="search" placeholder="Ответ"/>
-    <input type="submit" value="Отправить"/>
-</form>
-<button action="Remove"><span>Удалить</span></button>
-@*<form method="post">
-    <input type="submit" value="Удалить" onclick=@OnPostDelete(Model.ChatId, Model.DateTime)/>
-</form>*@
-<script src="/_framework/aspnetcore-browser-refresh.js"></script>
+    <form>
+        <textarea id="text" class="answer" value="@Model.Answer" name="query" placeholder="ответ"></textarea>
+        <div class="submit-container">
+            <input class="submit" formmethod="post" type="submit" value="Отправить" formaction="@Url.Action("Index", "Answer", new {id = Model.Id, query = Model.Answer})" />
+            <input class="submit" formmethod="post" formaction="@Url.Action("Remove", "Answer", new {id = Model.Id})" type="submit" value="Удалить" />
+        </div>
+    </form>
+</div>
+<script defer>
+    const p = document.getElementById('question');
+    const textarea = document.getElementById('text');
+    let height = (500 - p.clientHeight - 30 - 16) + 'px';
+    if (height > textarea.style.minHeight) {
+        textarea.style.height = height;
+    }
+</script>

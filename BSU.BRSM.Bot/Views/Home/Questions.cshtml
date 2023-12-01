@@ -1,0 +1,55 @@
+﻿@{
+    Layout = null;
+}
+@model IEnumerable<BSU.BRSM.Bot.Core.Models.User>;
+<style>
+    th {
+        text-align: center;
+    }
+</style>
+<table class="table-bordered table-striped">
+    <thead>
+        <tr>
+
+            <th>Фамилия</th>
+            <th>Имя</th>
+            <th>Вопрос</th>
+            <th>Закончен</th>
+            <th>Время отправки</th>
+            <th>Получен ответ</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var user in Model)
+            {
+                foreach (var question in user.Questions)
+                {
+                    string end = question.IsEnded ? "Да" : "Нет";
+                    string posted = question.IsPosted ? "Да" : " Нет";
+                    <tr>
+                        <td>
+                            <a href="@Url.Action("UserInfo", "Home", new {chatId = user.ChatId })">@user.FirstName</a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("UserInfo", "Home", new {chatId = user.ChatId })">@user.UserName</a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Index", "Answer", new {id = question.Id})">@question.Body</a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Index", "Answer", new {id = question.Id})">@end</a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Index", "Answer", new {id = question.Id})">@question.DateTime</a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Index", "Answer", new {id = question.Id})">@posted</a>
+                        </td>
+                    </tr>
+                }
+            }
+        }
+    </tbody>
+</table>
+<script src="~/js/site.js"></script>

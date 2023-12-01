@@ -1,0 +1,69 @@
+﻿@{
+    Layout = null;
+}
+
+@using BSU.BRSM.Bot.Core.Models;
+@using BSU.BRSM.Bot.Controllers;
+
+@model IEnumerable<BSU.BRSM.Bot.Core.Models.User>;
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/main.css"/>
+</head>
+<body>
+
+<header>
+    <nav style="margin-top: 20px">
+        <style>
+            a {
+                margin-left: 20px;
+            }
+        </style>
+        <a href="#">Домой</a>
+                <style>
+                    div.form-container {
+                        float: right;
+                    }
+                    button {
+                        margin-right: 20px;
+                        background-color: blue;
+                        color: white;
+                        border-radius: 4px;
+                    }
+                    input {
+                        border-radius: 4px;
+                        min-width: 300px;
+                    }
+                </style>
+                <div class="form-container">
+                    <form autocomplete="off">
+                        @{string query = "";}
+                        <input type="search" name="query" value="@query" placeholder="имя или фамилия" />
+                        <input class="submit" formmethod="get" formaction="@Url.Action("Search", "Home", new {query = query})" type="submit" value="Искать" />
+                    </form>
+                </div>
+    </nav>
+</header>
+
+@await Html.PartialAsync("Questions", Model);
+
+<style>
+    footer {
+        position: fixed;
+        bottom: 0;
+    }
+</style>
+<footer>
+    <style>
+        p {
+            position: center;
+        }
+    </style>
+    <p>Все права защищены</p>
+</footer>
+</body>
+</html>

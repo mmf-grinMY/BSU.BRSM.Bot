@@ -1,0 +1,25 @@
+﻿@using BSU.BRSM.Bot.Core.Models;
+@{
+    ViewData["Title"] = "Результаты поиска";
+}
+
+@model IEnumerable<BSU.BRSM.Bot.Core.Models.User>;
+
+<html>
+    <head>
+        <link rel="stylesheet" href="~/css/site.css"/>
+        <link rel="stylesheet" href="~/css/main.css"/>
+    </head>
+<body>
+<h1>Результаты поиска</h1>
+
+@if(!Model.Any())
+{
+    <p>По вашему запросу ничего не найдено!</p>
+}
+else
+{
+    @await Html.PartialAsync("Questions", Model);
+}
+</body>
+</html>

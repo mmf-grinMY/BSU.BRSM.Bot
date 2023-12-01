@@ -1,0 +1,45 @@
+﻿
+@{
+    ViewData["Title"] = "Posted";
+}
+@model BSU.BRSM.Bot.Core.Models.Question;
+
+<style>
+    h1 {
+        text-align: center;
+        color: green;
+    }
+</style>
+<h1>Вопрос успешно отправлен</h1>
+
+<table>
+    <tbody>
+        <tr>
+            <td><label>FisrtName </label></td>
+            <td><p><strong>@ViewData["FirstName"]</strong></p></td>
+        </tr>
+        <tr>
+            <td><label>UserName </label></td>
+            <td><p><strong>@ViewData["UserName"]</strong></p></td>
+        </tr>
+        <tr>
+            <td><label>Вопрос </label></td>
+            <td><p><strong>@Model.Body</strong></p></td>
+        </tr>
+        <tr>
+            <td><label>Ответ </label></td>
+            <td><p>@Model.Answer</p></td>
+        </tr>
+    </tbody>
+</table>
+
+<style>
+    button {
+        min-width: 200px;
+        border-radius: 4px;
+        background-color: blue;
+        color: white;
+        margin: 4px;
+    }
+</style>
+<button onclick="window.location.href='/Answer/Edit?id=@Model.Id'">Редактировать ответ</button>
